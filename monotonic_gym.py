@@ -45,7 +45,7 @@ def mean_return(weights, eval_seeds):
 
 
 def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10000, 10064),
-        start=None):
+        start=None, use_flight=False, out_name="best_weights.npz"):
     weights = {k: v.copy() for k, v in g.BASE_WEIGHTS.items()}
     if start is not None:
         weights = {k: np.load(start)[k].astype(np.float64) for k in
@@ -57,7 +57,7 @@ def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10
     stalls = 0
 
     for repair_idx in range(max_repairs):
-        failures, probes = g.mine(weights, mine_seeds)
+        failures, probes = g.mine(weights, mine_seeds, use_flight=use_flight)
         failures = [f for f in failures if f.obs.tobytes() not in unresolved]
         if not failures:
             print(f"[gym] no new avoidable failures after {repair_idx} attempts")
@@ -111,12 +111,15 @@ def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10
             print("   - " + card)
 
     if best is not None:
-        np.savez(ROOT / "best_weights.npz",
+        np.savez(ROOT / out_name,
                  **{k: v.astype(np.float32) for k, v in best[1].items()})
-        base_ho = mean_return(g.BASE_WEIGHTS, HELD_OUT_SEEDS)
+        start_weights = ({k: np.load(start)[k].astype(np.float64)
+                          for k in ("W1", "b1", "W2", "b2", "W3", "b3")}
+                         if start is not None else g.BASE_WEIGHTS)
+        base_ho = mean_return(start_weights, HELD_OUT_SEEDS)
         best_ho = mean_return(best[1], HELD_OUT_SEEDS)
-        print(f"\n[gym] best gated return {best[0]:.2f} (baseline "
-              f"{history[0]['return_before']:.2f}) -> wrote best_weights.npz")
+        print(f"\n[gym] best gated return {best[0]:.2f} (start "
+              f"{history[0]['return_before']:.2f}) -> wrote {out_name}")
         print(f"[gym] UNTOUCHED held-out check (seeds {HELD_OUT_SEEDS.start}-"
               f"{HELD_OUT_SEEDS.stop - 1}, never used for gating):")
         print(f"      baseline {base_ho:.2f} -> repaired {best_ho:.2f}  "

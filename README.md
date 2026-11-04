@@ -173,6 +173,38 @@ v1 stays the flagship release: never worse on 1,000 games is a stronger guarante
 +0.76 more mean with 17 catastrophic regressions. Extending the miner to ascent-phase
 positioning failures is the open problem.
 
+## Experiment 7 — closing the blind spot: the flight miner
+
+Experiment 6 ended with a structural admission: the miner only watched *descending* balls,
+so failing to pre-position the paddle during ascent was invisible. The fix is exact
+simulation: since the paddle only interacts with the ball at row 8, the ball's entire
+flight — ascent, brick bounces, wall bounces, brick removals — is deterministic given the
+current state. `flight_landing()` in `failure_gym.py` simulates it to the next row-8
+arrival, and `mine(use_flight=True)` flags ANY decision node (ascent included) where the
+chosen action makes that arrival uncoverable. The 13→0 seeds that yielded zero failures
+under the descent miner immediately produce clean failure cards (e.g. seed 20021 step 1:
+"ball will land col 8, paddle center 2, policy chose no-op — right saves it").
+
+A monotonic run from v3 with the flight miner keeps 6 of 12 edits and produces **v4**:
+
+| model | mean, seeds 20000-20999 | mean, seeds 30000-30999 (fresh) | W/L/T (fresh) |
+|---|---|---|---|
+| original | 8.69 | 8.89 | — |
+| v1 | 9.77 | — | never worse |
+| v3 | 10.53 | — | 17 losses |
+| **v4** | **12.18** (+3.49) | **12.19** (+3.30) | 253 / 20 / 727 |
+
+The fresh-set numbers match the contaminated set within noise — no gate overfitting.
+
+**But the blind-spot class itself resists repair.** A solver grid aimed directly at the
+seed-20021 ascent failure (W2 and W3, λ ∈ {10, 100, 1000}) fixes the state every time —
+and loses 1.5-2.6 gated return doing it: 460-2,300 probe decisions flip for one ascent
+state. The failure is *detectable* but not *cheaply correctable* by closed-form edits.
+v4 still carries the 13→0 class (~2% of games). The loop's verdict: detection is solved;
+correction needs either richer edits (multi-state batch constraints) or a parameter
+budget the readout/deep layers don't have. That is now the sharpest open question in the
+repo.
+
 ## Why it matters
 
 Weight-space editing promises behavior as inspectable, addressable mathematics: find the numbers responsible, change exactly those, verify nothing else moved. Experiment 1 shows the naive version of that promise fails even on a toy network — knowledge is stored in shared, overlapping features, so unconstrained edits are never local. Experiment 2 shows the fix is also mathematical: the same linear structure that makes failures diagnosable makes collateral damage *compressible into a constraint*. Diagnosis and containment come from the same equation. Experiment 3 marks the current boundary: at the readout layer the loop is exact and composes; one nonlinearity deeper, the measurement instrument and the edit start interfering with each other.

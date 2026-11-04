@@ -79,6 +79,47 @@ def landing_column(game):
             return c, 8 - game.row
 
 
+def flight_landing(game, cap=1000):
+    """Exact ball-only forward simulation, ANY phase (ascent, brick bounces, wall bounces),
+    until the ball next reaches row 8. Returns (landing_col, ticks_to_arrival).
+
+    Mirrors Breakout.step's collision logic minus paddle/reward: the paddle only matters
+    at row 8, so the landing column is fully determined by the current state. Brick
+    removals are tracked because they change later bounces within the same flight.
+    """
+    r, c, dy, dx = game.row, game.col, game.dy, game.dx
+    bricks = set(game.bricks)
+    for t in range(1, cap + 1):
+        if not 1 <= c + dx <= 8:
+            dx *= -1
+        if r + dy < 1:
+            dy *= -1
+        v = (r + dy, c)
+        h = (r, c + dx)
+        hits = set()
+        hit_v, hit_h = v in bricks, h in bricks
+        if hit_v:
+            hits.add(v); dy *= -1
+        if hit_h:
+            hits.add(h); dx *= -1
+        if not hit_v and not hit_h:
+            diagonal = (r + dy, c + dx)
+            if diagonal in bricks:
+                hits.add(diagonal); dy *= -1
+        bricks.difference_update(hits)
+        if not 1 <= c + dx <= 8:
+            dx *= -1
+        if r + dy < 1:
+            dy *= -1
+        nr, nc = r + dy, c + dx
+        if (nr, nc) in bricks:
+            nr, nc = r, c
+        if nr >= 8:
+            return nc, t
+        r, c = nr, nc
+    return None
+
+
 def salvageable_after(paddle_after, ticks_left, landing_col):
     """Can a paddle centered at paddle_after still cover landing_col with ticks_left moves remaining?"""
     lo = max(2, paddle_after - ticks_left)
@@ -86,10 +127,16 @@ def salvageable_after(paddle_after, ticks_left, landing_col):
     return lo <= landing_col + 1 and hi >= landing_col - 1
 
 
-def mine(weights, seeds, max_steps=200):
-    """Greedy rollouts; a FAILURE is the exact node where a descending ball's landing column
-    went from coverable to uncoverable because of the chosen paddle action."""
+def mine(weights, seeds, max_steps=200, use_flight=False):
+    """Greedy rollouts; a FAILURE is the exact node where the ball's next row-8 arrival
+    went from coverable to uncoverable because of the chosen paddle action.
+
+    use_flight=False: descent-only (landing_column) — the original miner, which is blind
+    to ascent-phase pre-positioning. use_flight=True: full flight simulation
+    (flight_landing), so a failure during ASCENT is also caught — e.g. failing to move
+    toward the future landing column while the ball is still bouncing off bricks."""
     failures, probes, seen = [], [], set()
+    land_fn = flight_landing if use_flight else landing_column
     for seed in seeds:
         game = Breakout(max_steps)
         game.reset(seed)
@@ -98,7 +145,7 @@ def mine(weights, seeds, max_steps=200):
             h2, logits = hidden_and_logits(weights, obs)
             action = int(logits.argmax())
             probes.append(obs)
-            land = landing_column(game)
+            land = land_fn(game)
             if land is not None:
                 landing_col, ticks = land
                 paddle_after = int(np.clip(game.paddle + PADDLE_MOVES[action], 2, 7))
