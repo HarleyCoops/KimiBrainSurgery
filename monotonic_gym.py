@@ -16,9 +16,13 @@ Same surgery as fullrank_gym.py (full-rank constrained W2 edits), with four rule
 Tracks the best weights ever seen (by gated mean return) and writes them to
 best_weights.npz at the end.
 
-Usage:  python monotonic_gym.py [lambda] [max_repairs]
+Live wandb streaming: set WANDB=1 (and be logged in) to stream each attempt to the
+kimi-brain-surgery project as it happens instead of backfilling from JSON.
+
+Usage:  python monotonic_gym.py [lambda] [max_repairs]   # WANDB=1 to stream
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -30,6 +34,26 @@ from w2_gym import gate, h1_h2_logits
 
 ROOT = Path(__file__).parent
 HELD_OUT_SEEDS = range(20000, 20064)  # never mined, never gated on — final check only
+WANDB = os.environ.get("WANDB", "").lower() in ("1", "true", "yes")
+WANDB_PROJECT = "kimi-brain-surgery"
+
+
+def _wandb_init(lam, max_repairs, start, use_flight):
+    if not WANDB:
+        return None
+    import wandb
+    return wandb.init(project=WANDB_PROJECT,
+                      name=f"monotonic-lam{'%g' % lam}-"
+                           f"{'flight' if use_flight else 'descent'}-live",
+                      group="monotonic-live",
+                      config={"lambda": lam, "max_repairs": max_repairs,
+                              "start": start or "base", "flight_miner": use_flight,
+                              "gate": "keep iff return_after >= return_before"})
+
+
+def _wandb_log(run, **kw):
+    if run is not None:
+        run.log(kw)
 
 
 def mean_return(weights, eval_seeds):
@@ -50,6 +74,7 @@ def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10
     if start is not None:
         weights = {k: np.load(start)[k].astype(np.float64) for k in
                    ("W1", "b1", "W2", "b2", "W3", "b3")}
+    wb_run = _wandb_init(lam, max_repairs, start, use_flight)
     history = []
     unresolved = {}           # obs bytes -> failure card, edits rolled back
     repaired = []             # (obs, saving actions, card) retested after each kept edit
@@ -78,6 +103,13 @@ def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10
                "dW2_norm": float(np.linalg.norm(dW2)), "n_newton": n_newton,
                "kept": bool(keep), "repaired_regressions": regressions, **report}
         history.append(rec)
+        _wandb_log(wb_run, attempt=repair_idx + 1, kept=int(keep),
+                   mean_return=report["return_after"],
+                   gate_return_before=report["return_before"],
+                   failure_fixed=int(report["fixed"]),
+                   probe_flip_frac=report["probe_flips"] / report["probe_size"],
+                   repaired_regressions=regressions,
+                   dW2_norm=float(np.linalg.norm(dW2)), n_newton=n_newton)
 
         verdict = "KEPT" if keep else "ROLLED BACK -> failure marked unresolved"
         print(f"\n=== ATTEMPT #{repair_idx + 1} (monotonic-on-gate, lambda={lam}) -> {verdict} ===")
@@ -125,6 +157,20 @@ def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10
         print(f"      baseline {base_ho:.2f} -> repaired {best_ho:.2f}  "
               f"({'generalizes' if best_ho >= base_ho else 'DOES NOT GENERALIZE — gate overfit'})")
         history.append({"held_out": True, "baseline": base_ho, "repaired": best_ho})
+        if wb_run is not None:
+            wb_run.summary["held_out_baseline"] = base_ho
+            wb_run.summary["held_out_repaired"] = best_ho
+            wb_run.summary["best_gated_return"] = best[0]
+            wb_run.summary["unresolved_count"] = len(unresolved)
+            import wandb as _wb
+            artifact = _wb.Artifact(
+                f"best-weights-lam{'%g' % lam}-{'flight' if use_flight else 'descent'}",
+                type="model",
+                description="best gated weights from this monotonic run")
+            artifact.add_file(str(ROOT / out_name))
+            wb_run.log_artifact(artifact)
+    if wb_run is not None:
+        wb_run.finish()
     return history, best
 
 
