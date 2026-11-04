@@ -1,0 +1,119 @@
+{
+  "lambda": 100.0,
+  "rule": "keep iff return_after >= return_before (measured gate only)",
+  "history": [
+    {
+      "attempt": 1,
+      "failure_card": "seed 12 step 53: ball at col 2 falling into col 3, paddle center 6 -> policy chose 'right' (logits [22.55 23.6  22.45 22.17 31.37]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          24,
+          2.663882474830909
+        ],
+        [
+          14,
+          2.5898863416811975
+        ],
+        [
+          2,
+          2.031999999999147
+        ]
+      ],
+      "dW2_norm": 0.5377886201168472,
+      "n_newton": 8,
+      "kept": true,
+      "repaired_regressions": 0,
+      "fixed": false,
+      "probe_flips": 143,
+      "probe_size": 21402,
+      "return_before": 8.15625,
+      "return_after": 8.1875
+    },
+    {
+      "attempt": 2,
+      "failure_card": "seed 12 step 63: ball at col 6 falling into col 5, paddle center 6 -> policy chose 'right' (logits [13.45 15.27 16.23  1.81 34.68]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          5,
+          3.034999999340199
+        ],
+        [
+          30,
+          3.0249999968728454
+        ],
+        [
+          3,
+          2.7459790380589317
+        ]
+      ],
+      "dW2_norm": 4.985369460587219,
+      "n_newton": 8,
+      "kept": true,
+      "repaired_regressions": 0,
+      "fixed": false,
+      "probe_flips": 2984,
+      "probe_size": 21490,
+      "return_before": 8.1875,
+      "return_after": 9.71875
+    },
+    {
+      "attempt": 3,
+      "failure_card": "seed 12 step 63: ball at col 6 falling into col 5, paddle center 6 -> policy chose 'right' (logits [16.92 16.79 16.04 -0.58 27.37]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          5,
+          3.034999999340197
+        ],
+        [
+          30,
+          3.0249999968728
+        ],
+        [
+          3,
+          2.7459778405745348
+        ]
+      ],
+      "dW2_norm": 5.362655027567327,
+      "n_newton": 8,
+      "kept": false,
+      "repaired_regressions": 0,
+      "fixed": false,
+      "probe_flips": 2840,
+      "probe_size": 22358,
+      "return_before": 9.71875,
+      "return_after": 9.578125
+    },
+    {
+      "attempt": 4,
+      "failure_card": "seed 36 step 142: ball at col 4 falling into col 8, paddle center 3 -> policy chose 'up' (logits [28.95 29.24 28.94 17.89 27.46]), any of ['right'] saves it",
+      "culprits": [
+        [
+          1,
+          3.5120308932670827
+        ],
+        [
+          15,
+          2.8497892260090865
+        ],
+        [
+          30,
+          2.6404625264310564
+        ]
+      ],
+      "dW2_norm": 0.2963628055578303,
+      "n_newton": 1,
+      "kept": true,
+      "repaired_regressions": 0,
+      "fixed": true,
+      "probe_flips": 289,
+      "probe_size": 22358,
+      "return_before": 9.71875,
+      "return_after": 9.828125
+    },
+    {
+      "held_out": true,
+      "baseline": 8.5625,
+      "repaired": 9.0625
+    }
+  ]
+}

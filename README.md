@@ -1,4 +1,4 @@
-# 🧠 KimiBrainSurgery
+# KimiBrainSurgery
 
 **An automated failure → diagnose → repair → verify loop that edits a neural network's weights directly — no retraining, no gradients — and measures how many repairs the network can absorb.**
 
@@ -21,6 +21,7 @@ python failure_gym.py          # naive solver
 python nullspace_gym.py 100    # null-space-constrained W3 solver, lambda=100
 python w2_gym.py 100           # rank-1 constrained W2 solver, lambda=100
 python fullrank_gym.py 100     # full-rank constrained W2 solver, lambda=100
+python monotonic_gym.py 100    # full-rank + keep/rollback gate; writes best_weights.npz
 ```
 
 Numpy only. Each run reproduces its report cards in a couple of minutes.
@@ -98,6 +99,22 @@ Three honest observations:
 2. **It still ends in interference.** Edit #8 (a re-mined variant of the seed-12 right-edge miss from #2/#3) knocks return from 10.47 back to 8.44. The ping-pong failure mode from Experiment 1 is down, not out.
 3. **λ is now a capability knob, not just a safety knob.** λ=10000 fixes nothing (constraint strangles the edit) but also preserves performance; λ=100 fixes fewer binary gates than W3 yet produces the best-playing network this project has ever had. "How many edits can it absorb" was the wrong question for deep layers — the right one is "what does the policy become."
 
+## Experiment 5 — the monotonic loop: surgery that can only help
+
+`monotonic_gym.py` adds the keep/rollback rule to the full-rank solver: an edit is applied only if gated mean return does not decrease, otherwise it is rolled back and the failure is marked **unresolved** — reported, never silently dropped. Previously repaired failures are retested after every kept edit, and a stall is reported as a *solver* stall, not proof of exhausted capacity. Because the evaluation is deterministic (greedy play, fixed seeds), the rule is exact.
+
+Result at λ=100: 3 of 4 proposed edits kept, one rolled back (the persistent seed-12 right-edge miss), and the run ends because the miner finds **no new avoidable failures** in 200 seeds. The composition curve is monotonic *on the measured gate* — a finite gate can miss regressions elsewhere, so the run closes with an untouched held-out evaluation on seeds never used for mining or gating:
+
+| | gate seeds (used in loop) | held-out seeds (never seen) |
+|---|---|---|
+| original | 8.16 | 8.56 |
+| repaired (3 kept edits) | **9.83** | **9.06** |
+
+The gain generalizes. The repaired weights are published as
+[`grid-policy-mlp-repaired`](https://huggingface.co/HarleyCooper/grid-policy-mlp-repaired),
+and the [live visualizer](https://harleycoops.github.io/breakout-policy-visualizer/) has a
+weights selector so you can watch the original and repaired policies play side by side.
+
 ## Why it matters
 
 Weight-space editing promises behavior as inspectable, addressable mathematics: find the numbers responsible, change exactly those, verify nothing else moved. Experiment 1 shows the naive version of that promise fails even on a toy network — knowledge is stored in shared, overlapping features, so unconstrained edits are never local. Experiment 2 shows the fix is also mathematical: the same linear structure that makes failures diagnosable makes collateral damage *compressible into a constraint*. Diagnosis and containment come from the same equation. Experiment 3 marks the current boundary: at the readout layer the loop is exact and composes; one nonlinearity deeper, the measurement instrument and the edit start interfering with each other.
@@ -112,9 +129,10 @@ Honest caveats: 17k parameters, greedy-play evaluation, W2/W3 edits only (W1 is 
 | `nullspace_gym.py` | Same loop, ridge-constrained (null-space) W3 solver; λ from argv |
 | `w2_gym.py` | Rank-1 probe-constrained W2 solver with trust region + Newton refinement |
 | `fullrank_gym.py` | Full-rank constrained W2 solver via block-diagonal Gram structure |
+| `monotonic_gym.py` | Full-rank solver + keep/rollback gate, regression retests, held-out final eval |
 | `plot_nullspace.py`, `make_gym_figure.py`, `plot_w2.py`, `plot_fullrank.py` | Figure generators |
 | `assets/game.py`, `assets/policy.py` | Authoritative deterministic Breakout physics + policy wrapper |
 | `assets/policy_weights.npz` | The trained GridPolicyMLP weights (17,253 params) |
-| `results_nullspace_*.json`, `results_w2_*.json`, `results_fullrank_*.json` | Raw run records for all λ sweeps |
+| `results_nullspace_*.json`, `results_w2_*.json`, `results_fullrank_*.json`, `results_monotonic_*.json` | Raw run records for all sweeps |
 
 *Physics engine from [weight-space-breakout](https://app.primeintellect.ai/dashboard/environments/harleycooper/weight-space-breakout) (MIT). Built with [Kimi](https://kimi.com).*
