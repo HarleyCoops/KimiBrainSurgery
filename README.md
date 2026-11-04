@@ -205,6 +205,59 @@ correction needs either richer edits (multi-state batch constraints) or a parame
 budget the readout/deep layers don't have. That is now the sharpest open question in the
 repo.
 
+## Experiment 8 — the batch solver: one edit for the whole class, and the price of the last 2%
+
+Experiment 7 ended with the sharpest open question: the 13→0 ascent class is detectable but not
+cheaply correctable state by state. The natural escalation is to stop paying per state and solve
+for the whole class at once. `batch_gym.py` collects every flight-mined failure under v4
+(7 states: 2 need `right`, 5 need `left`), stacks their linearized constraints into one system
+A d = b over the readout column, and solves the regularized problem in closed form:
+d = M⁻¹Aᵀ(AM⁻¹Aᵀ)⁻¹b, M = I + λHᵀH/N. One solve, one edit, every constraint satisfied — in
+theory.
+
+**In practice the class is not linearly separable at W3.** The 5 left-class constraints demand
+||d|| ≈ 14-17 in the 32-dimensional hidden space — they are nearly contradictory. Forcing them
+anyway fixes 5/7 states and collapses the policy: 5,561 of 13,650 probe decisions flip, gate
+return 12.09 → 2.41. A soft least-squares variant (trading exact satisfaction against damage)
+finds the frontier: at most 1/7 constraints can be fixed without return loss; the cheapest
+useful edit (the 2-constraint right class, ||d|| ≈ 0.64) still flips 2,045 probes and costs
+0.59 return.
+
+**Moving one layer up does not rescue it.** `batch_fullrank_gym.py` frees all 1,024 entries of
+W2 (block-diagonal Gram structure, K×K closed form, Newton re-linearization with a trust
+region), asking the hidden representations themselves to move apart so the existing W3 can
+separate them. The frontier moves but the shape does not:
+
+| solver | config | constraints fixed | probe flips | gate return |
+|---|---|---|---|---|
+| — (v4 baseline) | — | 0/7 | 0 | **12.09** |
+| W3 exact batch | λ=100 | 5/7 | 5,561 | 2.41 |
+| W3 soft batch | λ=50 | 1/7 | 933 | 11.30 |
+| W3 soft batch, left only | λ=100 | 1/7 | 174 | 12.09 |
+| W2 full-rank batch | λ=1e3, cap 0.5 | 5/7 | 1,750 | 7.31 |
+| W2 full-rank batch | λ=1e5, cap 0.5 | 2/7 | 834 | 9.47 |
+| W2 full-rank batch | λ=1e5, cap 0.1 | 0/7 | 287 | 12.09 |
+
+Every additional fixed constraint costs more than a point of mean return, and no configuration
+dominates v4. The gentlest Newton runs are the most damning: they accumulate ||dW2|| ≈ 3.5 of
+motion that fixes nothing — the regularizer steers the edit into the probe null space, where it
+is harmless and useless in equal measure.
+
+**Verdict: the residual 13→0 class is load-bearing.** The features that cause it are the same
+features normal play is built on, so separating failure from competence is not a geometry
+problem any closed-form edit can afford. The monotonic loop (Experiments 5-7) had already
+harvested every cheap gain — original 8.69 → v4 12.18, +40% — and Experiment 8 provides the
+quantified evidence that what remains is not cheap: fixing the last ~2% of games requires new
+capacity or training signal, not surgery. The batch solver still earns its place as an
+instrument: where constraints ARE mutually consistent it replaces K probe-and-solve cycles with
+one closed form, and as a *feasibility probe* it answered in minutes that the ascent class
+needs a bigger network, not a cleverer edit.
+
+All 18 sweep configurations are logged to W&B (project `kimi-brain-surgery`, group
+`batch-solver-sweep`) and recorded in `results_batch_sweep.json`. Gate caveat: 64 seeds,
+greedy play; "not fixable" means not fixable by these linearized closed-form edits at any
+regularization strength we tested.
+
 ## Why it matters
 
 Weight-space editing promises behavior as inspectable, addressable mathematics: find the numbers responsible, change exactly those, verify nothing else moved. Experiment 1 shows the naive version of that promise fails even on a toy network — knowledge is stored in shared, overlapping features, so unconstrained edits are never local. Experiment 2 shows the fix is also mathematical: the same linear structure that makes failures diagnosable makes collateral damage *compressible into a constraint*. Diagnosis and containment come from the same equation. Experiment 3 marks the current boundary: at the readout layer the loop is exact and composes; one nonlinearity deeper, the measurement instrument and the edit start interfering with each other.
@@ -220,6 +273,7 @@ Honest caveats: 17k parameters, greedy-play evaluation, W2/W3 edits only (W1 is 
 | `w2_gym.py` | Rank-1 probe-constrained W2 solver with trust region + Newton refinement |
 | `fullrank_gym.py` | Full-rank constrained W2 solver via block-diagonal Gram structure |
 | `monotonic_gym.py` | Full-rank solver + keep/rollback gate, regression retests, held-out final eval |
+| `batch_gym.py` / `batch_fullrank_gym.py` | Batch-constrained solvers: W3 exact/soft and full-rank W2, one edit per failure class |
 | `chase_unresolved.py` | Solver-grid attack on the one failure the monotonic loop rolled back |
 | `paired_eval.py` | Paired per-seed held-out eval with bootstrap CI + sign test |
 | `plot_nullspace.py`, `make_gym_figure.py`, `plot_w2.py`, `plot_fullrank.py` | Figure generators |
