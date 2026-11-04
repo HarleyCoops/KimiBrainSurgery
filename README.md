@@ -259,6 +259,58 @@ All 18 sweep configurations are logged to W&B (project `kimi-brain-surgery`, gro
 greedy play; "not fixable" means not fixable by these linearized closed-form edits at the
 listed regularization strengths and solver settings.
 
+## Experiment 9 — the complete chain, and why repairing the decision is not enough
+
+The chain Chris specified, built as `chain_gym.py` and run continuously from v4:
+identify an avoidable failure in the current accepted policy, repair it, preserve
+previously protected behavior, pass a fresh evaluation, repeat. Each attempt mines a
+flight-phase failure, then walks a repair ladder of increasing expressiveness —
+W3 null-space closed form, W2 full-rank closed form, elastic-anchored gradient hinge —
+and the FIRST candidate that passes a hard gate wins. The gate is strict: target state
+fixed, ZERO regressions on every previously repaired state, gate-seed mean return not
+down. Deferred failures are not retried; a batch-gradient phase fires once per stall.
+
+Result of the first full run (9 attempts, 30 ladder evaluations):
+
+| outcome | count |
+|---|---|
+| edits kept (all w2-fullrank, 91-251 flips, zero regressions) | 3 |
+| candidates rejected by the gate | 27 |
+| failures deferred as unfixable-within-gate | 6 |
+| gate return | 12.09 -> 12.09 (never worse, by construction) |
+| fresh paired eval, seeds 40000-40499 (untouched until the end) | +0.000, 500/500 ties |
+
+The gate did its job — the chain is monotonic on the measured gate and every kept edit
+is a verified decision fix. And then the fresh eval exposed something deeper: **the three
+repaired games score exactly the same as before.** Not approximately — identically, 300/300
+development seeds and 500/500 fresh seeds, even though the kept edits are real (max |dW2|
+= 0.16) and the failure states verifiably flip to the saving action.
+
+Replaying the repaired games frame by frame shows why. Seed 9, ball ascending, lands col 1
+in 5 ticks, paddle at 7 — the rescue requires five consecutive `left` moves:
+
+    step 17: left   <- the repaired decision (was: up)
+    step 18: left
+    step 19: left
+    step 20: no-op  <- the follow-through defect
+    step 21: left   <- too late; paddle stops at 4, ball lands at 1
+
+One defection at step 20 wastes the entire rescue. Same story on seeds 1 and 12. The chain
+repaired the entry node of each failure, but a rescue is a *trajectory*: the saving action
+must be taken at every node until the ball is caught, and nothing constrains the policy
+downstream of the repaired state. This also retroactively explains the Experiment 8
+frontier — the residual 13->0 class is precisely the set of failures whose rescue requires
+multi-step commitment, and no single-node edit, however clever, can supply that.
+
+The fix is well-defined: trajectory-constrained repair. When a failure is mined, roll the
+rescue prefix forward under forced saving actions, collect every successor state until the
+catch, and add each as a constraint in the same solve — the policy must hold the commitment,
+not just enter it. That is Experiment 10.
+
+`chain_final.npz` (v4 + 3 gated decision repairs) is kept in the repo as the accepted
+checkpoint; no v5 was published, because the fresh-seed gain is zero and the honest model
+is the one that earned it.
+
 ## Why it matters
 
 Weight-space editing promises behavior as inspectable, addressable mathematics: find the numbers responsible, change exactly those, verify nothing else moved. Experiment 1 shows the naive version of that promise fails even on a toy network — knowledge is stored in shared, overlapping features, so unconstrained edits are never local. Experiment 2 shows the fix is also mathematical: the same linear structure that makes failures diagnosable makes collateral damage *compressible into a constraint*. Diagnosis and containment come from the same equation. Experiment 3 marks the current boundary: at the readout layer the loop is exact and composes; one nonlinearity deeper, the measurement instrument and the edit start interfering with each other.
@@ -274,6 +326,7 @@ Honest caveats: 17k parameters, greedy-play evaluation, W2/W3 edits only (W1 is 
 | `w2_gym.py` | Rank-1 probe-constrained W2 solver with trust region + Newton refinement |
 | `fullrank_gym.py` | Full-rank constrained W2 solver via block-diagonal Gram structure |
 | `monotonic_gym.py` | Full-rank solver + keep/rollback gate, regression retests, held-out final eval |
+| `chain_gym.py` | The complete chain: mine, repair (W3/W2/gradient ladder), hard gate, fresh eval, repeat |
 | `batch_gym.py` / `batch_fullrank_gym.py` | Batch-constrained solvers: W3 exact/soft and full-rank W2, one edit per failure class |
 | `chase_unresolved.py` | Solver-grid attack on the one failure the monotonic loop rolled back |
 | `paired_eval.py` | Paired per-seed held-out eval with bootstrap CI + sign test |

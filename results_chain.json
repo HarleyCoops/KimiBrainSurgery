@@ -1,0 +1,304 @@
+{
+  "kept_edits": 3,
+  "attempts": 28,
+  "repaired_states_protected": 3,
+  "fresh_mean_original": 8.708,
+  "fresh_mean_v4": 11.63,
+  "fresh_mean_final": 11.63,
+  "fresh_diff_vs_v4": 0.0,
+  "fresh_diff_vs_original": 2.922,
+  "fresh_vs_v4_WLT": [
+    0,
+    0,
+    500
+  ],
+  "dev_diff_vs_v4": 0.0,
+  "dev_vs_v4_WLT": [
+    0,
+    0,
+    300
+  ],
+  "history": [
+    {
+      "attempt": 1,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 20021 step 1: ball at col 3 falling into col 8, paddle center 2 -> policy chose 'no-op' (logits [30.23 30.21 30.13 30.09 30.05]), any of ['right'] saves it",
+      "fixed": 0,
+      "regressions": 0,
+      "probe_flips": 7423,
+      "return_after": 11.296875
+    },
+    {
+      "attempt": 1,
+      "method": "w2-fullrank",
+      "kept": false,
+      "card": "seed 20021 step 1: ball at col 3 falling into col 8, paddle center 2 -> policy chose 'no-op' (logits [30.23 30.21 30.13 30.09 30.05]), any of ['right'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 1397,
+      "return_after": 9.46875
+    },
+    {
+      "attempt": 1,
+      "method": "gradient",
+      "kept": false,
+      "card": "seed 20021 step 1: ball at col 3 falling into col 8, paddle center 2 -> policy chose 'no-op' (logits [30.23 30.21 30.13 30.09 30.05]), any of ['right'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 8355,
+      "return_after": 9.46875
+    },
+    {
+      "attempt": 2,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 1 step 34: ball at col 5 falling into col 1, paddle center 6 -> policy chose 'right' (logits [21.27 22.44 21.43 19.69 26.36]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 1912,
+      "return_after": 10.015625
+    },
+    {
+      "attempt": 2,
+      "method": "w2-fullrank",
+      "kept": true,
+      "card": "seed 1 step 34: ball at col 5 falling into col 1, paddle center 6 -> policy chose 'right' (logits [21.27 22.44 21.43 19.69 26.36]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 237,
+      "return_after": 12.09375
+    },
+    {
+      "attempt": 3,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 1 step 36: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'down' (logits [31.39 31.37 31.42 20.96 26.65]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 1,
+      "probe_flips": 3587,
+      "return_after": 10.453125
+    },
+    {
+      "attempt": 3,
+      "method": "w2-fullrank",
+      "kept": false,
+      "card": "seed 1 step 36: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'down' (logits [31.39 31.37 31.42 20.96 26.65]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 2537,
+      "return_after": 9.609375
+    },
+    {
+      "attempt": 3,
+      "method": "gradient",
+      "kept": false,
+      "card": "seed 1 step 36: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'down' (logits [31.39 31.37 31.42 20.96 26.65]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 0,
+      "probe_flips": 19423,
+      "return_after": 3.15625
+    },
+    {
+      "attempt": 4,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 2 step 28: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.67 30.95 30.63 18.93 27.23]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 1,
+      "probe_flips": 10691,
+      "return_after": 9.65625
+    },
+    {
+      "attempt": 4,
+      "method": "w2-fullrank",
+      "kept": false,
+      "card": "seed 2 step 28: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.67 30.95 30.63 18.93 27.23]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 5077,
+      "return_after": 10.75
+    },
+    {
+      "attempt": 4,
+      "method": "gradient",
+      "kept": false,
+      "card": "seed 2 step 28: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.67 30.95 30.63 18.93 27.23]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 0,
+      "probe_flips": 20425,
+      "return_after": 3.71875
+    },
+    {
+      "attempt": 4,
+      "method": "batch-gradient",
+      "kept": false,
+      "fixed": 1,
+      "of": 3,
+      "regressions": 0,
+      "probe_flips": 20707,
+      "return_after": 4.015625
+    },
+    {
+      "attempt": 5,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 5 step 43: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'right' (logits [28.8  28.91 28.6  27.16 30.29]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 0,
+      "probe_flips": 8178,
+      "return_after": 5.796875
+    },
+    {
+      "attempt": 5,
+      "method": "w2-fullrank",
+      "kept": false,
+      "card": "seed 5 step 43: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'right' (logits [28.8  28.91 28.6  27.16 30.29]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 1565,
+      "return_after": 10.0625
+    },
+    {
+      "attempt": 5,
+      "method": "gradient",
+      "kept": false,
+      "card": "seed 5 step 43: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'right' (logits [28.8  28.91 28.6  27.16 30.29]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 16245,
+      "return_after": 2.90625
+    },
+    {
+      "attempt": 5,
+      "method": "batch-gradient",
+      "kept": false,
+      "fixed": 2,
+      "of": 4,
+      "regressions": 0,
+      "probe_flips": 21186,
+      "return_after": 3.21875
+    },
+    {
+      "attempt": 6,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 9 step 17: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'up' (logits [29.78 29.84 29.6  28.6  28.7 ]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 0,
+      "probe_flips": 11765,
+      "return_after": 7.8125
+    },
+    {
+      "attempt": 6,
+      "method": "w2-fullrank",
+      "kept": true,
+      "card": "seed 9 step 17: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'up' (logits [29.78 29.84 29.6  28.6  28.7 ]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 251,
+      "return_after": 12.09375
+    },
+    {
+      "attempt": 7,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 9 step 20: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'no-op' (logits [30.46 30.34 29.14 17.87 25.42]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 2,
+      "probe_flips": 14030,
+      "return_after": 7.3125
+    },
+    {
+      "attempt": 7,
+      "method": "w2-fullrank",
+      "kept": false,
+      "card": "seed 9 step 20: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'no-op' (logits [30.46 30.34 29.14 17.87 25.42]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 1,
+      "probe_flips": 4021,
+      "return_after": 8.9375
+    },
+    {
+      "attempt": 7,
+      "method": "gradient",
+      "kept": false,
+      "card": "seed 9 step 20: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'no-op' (logits [30.46 30.34 29.14 17.87 25.42]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 0,
+      "probe_flips": 20341,
+      "return_after": 3.71875
+    },
+    {
+      "attempt": 7,
+      "method": "batch-gradient",
+      "kept": false,
+      "fixed": 4,
+      "of": 5,
+      "regressions": 0,
+      "probe_flips": 21485,
+      "return_after": 3.21875
+    },
+    {
+      "attempt": 8,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 12 step 199: ball at col 6 falling into col 7, paddle center 3 -> policy chose 'no-op' (logits [27.92 26.87 26.65 16.89 26.96]), any of ['right'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 4449,
+      "return_after": 11.65625
+    },
+    {
+      "attempt": 8,
+      "method": "w2-fullrank",
+      "kept": true,
+      "card": "seed 12 step 199: ball at col 6 falling into col 7, paddle center 3 -> policy chose 'no-op' (logits [27.92 26.87 26.65 16.89 26.96]), any of ['right'] saves it",
+      "fixed": 1,
+      "regressions": 0,
+      "probe_flips": 91,
+      "return_after": 12.09375
+    },
+    {
+      "attempt": 9,
+      "method": "w3-nullspace",
+      "kept": false,
+      "card": "seed 39 step 44: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.32 30.49 30.   18.01 27.11]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 1,
+      "probe_flips": 11018,
+      "return_after": 11.296875
+    },
+    {
+      "attempt": 9,
+      "method": "w2-fullrank",
+      "kept": false,
+      "card": "seed 39 step 44: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.32 30.49 30.   18.01 27.11]), any of ['left'] saves it",
+      "fixed": 1,
+      "regressions": 1,
+      "probe_flips": 5001,
+      "return_after": 10.796875
+    },
+    {
+      "attempt": 9,
+      "method": "gradient",
+      "kept": false,
+      "card": "seed 39 step 44: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.32 30.49 30.   18.01 27.11]), any of ['left'] saves it",
+      "fixed": 0,
+      "regressions": 1,
+      "probe_flips": 21309,
+      "return_after": 3.21875
+    },
+    {
+      "attempt": 9,
+      "method": "batch-gradient",
+      "kept": false,
+      "fixed": 4,
+      "of": 6,
+      "regressions": 0,
+      "probe_flips": 21629,
+      "return_after": 3.28125
+    }
+  ],
+  "v5_written": false
+}
