@@ -1,6 +1,6 @@
 # KimiBrainSurgery
 
-**An automated failure → diagnose → repair → verify loop that edits a neural network's weights directly — no retraining, no gradients — and measures how many repairs the network can absorb.**
+**An automated failure → diagnose → repair → verify loop that edits a neural network's weights directly — no gradient-descent retraining; W2 solvers use analytic derivatives — and measures how many repairs the network can absorb.**
 
 The patient: [`GridPolicyMLP`](https://huggingface.co/HarleyCooper/grid-policy-mlp), a 17,253-parameter PPO-trained Breakout policy (500→32→32→5, tanh). Companion to the [live visualizer](https://harleycoops.github.io/breakout-policy-visualizer/).
 
@@ -97,9 +97,9 @@ Three honest observations:
 
 1. **The gate and the game disagree, in both directions.** Edits #1–#3 at λ=100 are marked `fixed=False` — the exact failure state's argmax never entered the saving set (tanh saturation shrinks the constraint direction, and 8 trust-region steps can't reach it) — yet return *rose* through them. Partial fixes that move the decision boundary toward the saving action still improve play even when the binary gate says "not fixed."
 2. **It still ends in interference.** Edit #8 (a re-mined variant of the seed-12 right-edge miss from #2/#3) knocks return from 10.47 back to 8.44. The ping-pong failure mode from Experiment 1 is down, not out.
-3. **λ is now a capability knob, not just a safety knob.** λ=10000 fixes nothing (constraint strangles the edit) but also preserves performance; λ=100 fixes fewer binary gates than W3 yet produces the best-playing network this project has ever had. "How many edits can it absorb" was the wrong question for deep layers — the right one is "what does the policy become."
+3. **λ is now a capability knob, not just a safety knob.** λ=10000 fixes nothing (constraint strangles the edit) and ends at 4.05 return versus the 8.16 baseline; λ=100 fixes fewer binary gates than W3 yet produces the best-playing network this project has ever had. "How many edits can it absorb" was the wrong question for deep layers — the right one is "what does the policy become."
 
-## Experiment 5 — the monotonic loop: surgery that can only help
+## Experiment 5 — the monotonic loop: nondecreasing return on the reused gate
 
 `monotonic_gym.py` adds the keep/rollback rule to the full-rank solver: an edit is applied only if gated mean return does not decrease, otherwise it is rolled back and the failure is marked **unresolved** — reported, never silently dropped. Previously repaired failures are retested after every kept edit, and a stall is reported as a *solver* stall, not proof of exhausted capacity. Because the evaluation is deterministic (greedy play, fixed seeds), the rule is exact.
 
@@ -138,7 +138,7 @@ Results over 1,000 paired games:
 | sign test p | < 10⁻⁴ |
 
 The picture is unambiguous: the repaired policy is **never worse on any of 1,000 games**
-and strictly better in 137 of them — a strict stochastic improvement, concentrated in the
+and strictly better in 137 of them — an observed paired improvement on this finite set, concentrated in the
 games where the original policy had the specific failure the gym repaired. (An earlier
 64-game pilot showed the same shape — 4/0/60 — but with a CI that barely excluded zero;
 the larger set tightens the estimate from +0.50 [+0.02, +1.20] to +1.08 [+0.85, +1.31].)
@@ -169,9 +169,9 @@ structural blind spot** — the failure happens at a node the failure definition
 The fix for the last descending-ball failure cost an ascending-ball behavior, and no part
 of the mine → diagnose → solve loop could see it. Only the paired eval could.
 
-v1 stays the flagship release: never worse on 1,000 games is a stronger guarantee than
-+0.76 more mean with 17 catastrophic regressions. Extending the miner to ascent-phase
-positioning failures is the open problem.
+v1 has zero observed losses on these 1,000 games; that is not a never-worse guarantee.
+v3 has higher mean return on this set but 17 regressions. Experiment 7 extends
+the miner to ascent-phase positioning failures.
 
 ## Experiment 7 — closing the blind spot: the flight miner
 
@@ -190,11 +190,11 @@ A monotonic run from v3 with the flight miner keeps 6 of 12 edits and produces *
 | model | mean, seeds 20000-20999 | mean, seeds 30000-30999 (fresh) | W/L/T (fresh) |
 |---|---|---|---|
 | original | 8.69 | 8.89 | — |
-| v1 | 9.77 | — | never worse |
-| v3 | 10.53 | — | 17 losses |
+| v1 | 9.77 | — | not evaluated on fresh set here |
+| v3 | 10.53 | — | not evaluated on fresh set here |
 | **v4** | **12.18** (+3.49) | **12.19** (+3.30) | 253 / 20 / 727 |
 
-The fresh-set numbers match the contaminated set within noise — no gate overfitting.
+The fresh set supports a positive mean gain. Agreement with the development set does not rule out gate overfitting or regressions elsewhere.
 
 **But the blind-spot class itself resists repair.** A solver grid aimed directly at the
 seed-20021 ascent failure (W2 and W3, λ ∈ {10, 100, 1000}) fixes the state every time —
@@ -215,13 +215,13 @@ A d = b over the readout column, and solves the regularized problem in closed fo
 d = M⁻¹Aᵀ(AM⁻¹Aᵀ)⁻¹b, M = I + λHᵀH/N. One solve, one edit, every constraint satisfied — in
 theory.
 
-**In practice the class is not linearly separable at W3.** The 5 left-class constraints demand
-||d|| ≈ 14-17 in the 32-dimensional hidden space — they are nearly contradictory. Forcing them
-anyway fixes 5/7 states and collapses the policy: 5,561 of 13,650 probe decisions flip, gate
-return 12.09 → 2.41. A soft least-squares variant (trading exact satisfaction against damage)
-finds the frontier: at most 1/7 constraints can be fixed without return loss; the cheapest
-useful edit (the 2-constraint right class, ||d|| ≈ 0.64) still flips 2,045 probes and costs
-0.59 return.
+**The tested W3 edits have a severe interference cost.** The five left-class
+constraints require large edit norms (roughly 14–17). This does not establish
+linear inseparability. The implementation solves separate saving-column equality
+systems; those equalities do not constrain every competing logit after all column
+updates. The exact lambda-100 candidate fixes 5/7 states but drops gate return
+12.09375 → 2.40625 and flips 5,561/13,650 probe decisions. A left-only soft
+candidate fixes 1/7 at unchanged gate mean, with 174 probe flips.
 
 **Moving one layer up does not rescue it.** `batch_fullrank_gym.py` frees all 1,024 entries of
 W2 (block-diagonal Gram structure, K×K closed form, Newton re-linearization with a trust
@@ -238,25 +238,26 @@ separate them. The frontier moves but the shape does not:
 | W2 full-rank batch | λ=1e5, cap 0.5 | 2/7 | 834 | 9.47 |
 | W2 full-rank batch | λ=1e5, cap 0.1 | 0/7 | 287 | 12.09 |
 
-Every additional fixed constraint costs more than a point of mean return, and no configuration
-dominates v4. The gentlest Newton runs are the most damning: they accumulate ||dW2|| ≈ 3.5 of
-motion that fixes nothing — the regularizer steers the edit into the probe null space, where it
-is harmless and useless in equal measure.
+None of the 18 configurations fixes all seven states while maintaining gate
+mean return, so no v5 was written. Some small trust-region W2 runs move parameters
+without fixing a state. These are results for the tested objectives, layer choices,
+regularization strengths, and step budgets; they are not an impossibility proof.
 
-**Verdict: the residual 13→0 class is load-bearing.** The features that cause it are the same
-features normal play is built on, so separating failure from competence is not a geometry
-problem any closed-form edit can afford. The monotonic loop (Experiments 5-7) had already
-harvested every cheap gain — original 8.69 → v4 12.18, +40% — and Experiment 8 provides the
-quantified evidence that what remains is not cheap: fixing the last ~2% of games requires new
-capacity or training signal, not surgery. The batch solver still earns its place as an
-instrument: where constraints ARE mutually consistent it replaces K probe-and-solve cycles with
-one closed form, and as a *feasibility probe* it answered in minutes that the ascent class
-needs a bigger network, not a cleverer edit.
+**Verdict: the tested batch repairs do not meet the promotion rule.** Shared
+features and interference are plausible explanations. The experiment does not
+prove that larger capacity is necessary or that gradient training will succeed.
+The 1/7 fixed, equal-return candidate is a counterexample to an unconditional
+claim that every extra repaired state costs return; it still fails the stricter
+all-seven requirement. v4 remains published.
+
+The batch miner uses eight loss seeds from the former v4 fresh set (30000 range).
+Those examples are now development data for later experiments. Preserve the
+frozen v4 result historically and reserve a new untouched set before testing v5.
 
 All 18 sweep configurations are logged to W&B (project `kimi-brain-surgery`, group
 `batch-solver-sweep`) and recorded in `results_batch_sweep.json`. Gate caveat: 64 seeds,
-greedy play; "not fixable" means not fixable by these linearized closed-form edits at any
-regularization strength we tested.
+greedy play; "not fixable" means not fixable by these linearized closed-form edits at the
+listed regularization strengths and solver settings.
 
 ## Why it matters
 
@@ -280,7 +281,28 @@ Honest caveats: 17k parameters, greedy-play evaluation, W2/W3 edits only (W1 is 
 | `assets/game.py`, `assets/policy.py` | Authoritative deterministic Breakout physics + policy wrapper |
 | `assets/policy_weights.npz` | The trained GridPolicyMLP weights (17,253 params) |
 | `results_nullspace_*.json`, `results_w2_*.json`, `results_fullrank_*.json`, `results_monotonic_*.json` | Raw run records for all sweeps |
-| `best_weights.npz` / `best_weights_v3.npz` | The repaired checkpoints (v1 = never-worse; v3 = max mean, 17 regressions) |
+| `best_weights.npz` / `best_weights_v3.npz` | The repaired checkpoints (v1 = zero observed old-set losses; v3 = 17 old-set regressions; v4 available separately) |
 | `eval/paired_heldout*.json` | Paired per-seed held-out scores, 1000 games |
 
 *Physics engine from [weight-space-breakout](https://app.primeintellect.ai/dashboard/environments/harleycooper/weight-space-breakout) (MIT). Built with [Kimi](https://kimi.com).*
+
+## Evidence reconciliation — 2026-11-03
+
+[Consolidated status](https://github.com/HarleyCoops/FailureIsAllYouNeed/blob/codex/initial-results/docs/STATUS_2026-11-03.md) · [Dataset](https://huggingface.co/datasets/HarleyCooper/failure-is-all-you-need-evaluations) · [Full mathematics](https://github.com/HarleyCoops/FailureIsAllYouNeed/blob/codex/initial-results/docs/KIMI_METHODS.md).
+
+The monotonic rule checks mean return on 64 reused gate seeds. Failure repair,
+probe flips, and repaired-state retests are diagnostics, not additional acceptance
+requirements. Only one of the three kept v1 edits reports `fixed=True`.
+The 18 sweep runs apply all candidates, including regressions.
+
+The v4 old-set file contains all 1,000 games, with 17 failures informing development.
+The v1 1,000-game set includes its earlier 64-game pilot. These are not fully
+independent replications. Finite evaluations cannot prove an absence of regressions.
+
+Cross-repo solver results must preserve checkpoint identity, action mode, float
+precision, and random-number protocol. The Qwen patch improves sampled return but
+regresses in our local greedy check. Its three edited parameters also change argmax
+decisions. A reported repaired seed-314159 free-play return of 14 has not been
+reproduced under the frozen Qwen protocol. `cross_repo2.py` reuses 256 Qwen audit
+seeds for selection, making them development data for that later search.
+See [reconciliation and exact local evidence](https://github.com/HarleyCoops/FailureIsAllYouNeed/blob/codex/initial-results/docs/CROSS_REPO_RECONCILIATION.md).
