@@ -115,6 +115,26 @@ The gain generalizes. The repaired weights are published as
 and the [live visualizer](https://harleycoops.github.io/breakout-policy-visualizer/) has a
 weights selector so you can watch the original and repaired policies play side by side.
 
+### Paired per-seed verification
+
+`paired_eval.py` replays both checkpoints on the same 64 held-out games and stores every
+per-seed score in `eval/paired_heldout.json`. Exact checkpoints, hashed for reproduction:
+
+| checkpoint | sha256 (first 16) |
+|---|---|
+| `policy_weights.npz` (original) | `d3cd5623fdae730f` |
+| `best_weights.npz` (repaired) | `9c338f7c08c9590a` |
+
+The paired picture is more honest than the means alone: **60 of 64 games are exact ties**,
+and the entire +0.50 gain comes from 4 games the repaired policy wins — two of them
+decisively (2 → 17, seeds 20006 and 20029). Zero games get worse. The bootstrap 95% CI on
+the paired difference is [+0.02, +1.20] reward/game; a two-sided sign test over the 4
+non-tied games gives p = 0.125. Reading: the repair is a strict improvement in the
+stochastic sense (never worse, sometimes much better), concentrated in a small number of
+games where the original policy had a specific exploitable failure — exactly what
+failure-targeted editing should produce. 64 games cannot pin down the effect size tightly;
+more held-out seeds would narrow the CI.
+
 ## Why it matters
 
 Weight-space editing promises behavior as inspectable, addressable mathematics: find the numbers responsible, change exactly those, verify nothing else moved. Experiment 1 shows the naive version of that promise fails even on a toy network — knowledge is stored in shared, overlapping features, so unconstrained edits are never local. Experiment 2 shows the fix is also mathematical: the same linear structure that makes failures diagnosable makes collateral damage *compressible into a constraint*. Diagnosis and containment come from the same equation. Experiment 3 marks the current boundary: at the readout layer the loop is exact and composes; one nonlinearity deeper, the measurement instrument and the edit start interfering with each other.
@@ -130,6 +150,7 @@ Honest caveats: 17k parameters, greedy-play evaluation, W2/W3 edits only (W1 is 
 | `w2_gym.py` | Rank-1 probe-constrained W2 solver with trust region + Newton refinement |
 | `fullrank_gym.py` | Full-rank constrained W2 solver via block-diagonal Gram structure |
 | `monotonic_gym.py` | Full-rank solver + keep/rollback gate, regression retests, held-out final eval |
+| `paired_eval.py` | Paired per-seed held-out eval with bootstrap CI + sign test |
 | `plot_nullspace.py`, `make_gym_figure.py`, `plot_w2.py`, `plot_fullrank.py` | Figure generators |
 | `assets/game.py`, `assets/policy.py` | Authoritative deterministic Breakout physics + policy wrapper |
 | `assets/policy_weights.npz` | The trained GridPolicyMLP weights (17,253 params) |
