@@ -1,0 +1,213 @@
+{
+  "lambda": 1000.0,
+  "history": [
+    {
+      "repair": 1,
+      "failure_card": "seed 12 step 53: ball at col 2 falling into col 3, paddle center 6 -> policy chose 'right' (logits [22.55 23.6  22.45 22.17 31.37]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          24,
+          2.663882474830909
+        ],
+        [
+          14,
+          2.5898863416811975
+        ],
+        [
+          2,
+          2.031999999999147
+        ]
+      ],
+      "alpha": 99.13825426940647,
+      "d_norm": 8.640455303850821,
+      "H_size": 4281,
+      "fixed": true,
+      "probe_flips": 6818,
+      "probe_size": 21402,
+      "return_before": 8.15625,
+      "return_after": 7.34375
+    },
+    {
+      "repair": 2,
+      "failure_card": "seed 12 step 63: ball at col 6 falling into col 5, paddle center 6 -> policy chose 'right' (logits [12.92 15.27 16.23  1.81 35.21]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          28,
+          7.7279629496594096
+        ],
+        [
+          3,
+          4.263845431530627
+        ],
+        [
+          2,
+          3.0053793765281216
+        ]
+      ],
+      "alpha": 284.2544394298021,
+      "d_norm": 18.746477562413556,
+      "H_size": 4735,
+      "fixed": true,
+      "probe_flips": 3073,
+      "probe_size": 18940,
+      "return_before": 7.34375,
+      "return_after": 4.390625
+    },
+    {
+      "repair": 3,
+      "failure_card": "seed 11 step 5: ball at col 7 falling into col 8, paddle center 6 -> policy chose 'no-op' (logits [20.42 15.61 16.48  4.94 20.32]), any of ['right'] saves it",
+      "culprits": [
+        [
+          25,
+          7.740813969683475
+        ],
+        [
+          7,
+          5.766239261714158
+        ],
+        [
+          1,
+          4.959049033849546
+        ]
+      ],
+      "alpha": 2.703837581196007,
+      "d_norm": 0.10467372056657616,
+      "H_size": 4004,
+      "fixed": true,
+      "probe_flips": 29,
+      "probe_size": 12012,
+      "return_before": 4.390625,
+      "return_after": 5.0
+    },
+    {
+      "repair": 4,
+      "failure_card": "seed 12 step 53: ball at col 2 falling into col 3, paddle center 6 -> policy chose 'right' (logits [25.06 23.6  22.45 22.17 28.85]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          25,
+          8.011457210696422
+        ],
+        [
+          0,
+          6.8221609813466655
+        ],
+        [
+          10,
+          4.929607036358485
+        ]
+      ],
+      "alpha": 53.33293175217041,
+      "d_norm": 3.6067910157787373,
+      "H_size": 4780,
+      "fixed": true,
+      "probe_flips": 679,
+      "probe_size": 14340,
+      "return_before": 5.0,
+      "return_after": 5.28125
+    },
+    {
+      "repair": 5,
+      "failure_card": "seed 12 step 63: ball at col 6 falling into col 5, paddle center 6 -> policy chose 'right' (logits [23.81 15.27 16.23  1.81 24.32]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          3,
+          7.008043282957314
+        ],
+        [
+          10,
+          4.861762100182435
+        ],
+        [
+          28,
+          4.265500440052123
+        ]
+      ],
+      "alpha": 15.185723043515837,
+      "d_norm": 0.4898271559733503,
+      "H_size": 5301,
+      "fixed": true,
+      "probe_flips": 273,
+      "probe_size": 15902,
+      "return_before": 5.28125,
+      "return_after": 5.25
+    },
+    {
+      "repair": 6,
+      "failure_card": "seed 12 step 53: ball at col 2 falling into col 3, paddle center 6 -> policy chose 'right' (logits [26.95 23.6  22.45 22.17 26.97]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          25,
+          8.148355828398975
+        ],
+        [
+          0,
+          7.0622861889491935
+        ],
+        [
+          10,
+          5.00888110787458
+        ]
+      ],
+      "alpha": 1.5788540092491516,
+      "d_norm": 0.1112466272386491,
+      "H_size": 5272,
+      "fixed": true,
+      "probe_flips": 54,
+      "probe_size": 15814,
+      "return_before": 5.25,
+      "return_after": 5.71875
+    },
+    {
+      "repair": 7,
+      "failure_card": "seed 23 step 81: ball at col 7 falling into col 8, paddle center 6 -> policy chose 'no-op' (logits [25.85 14.36 16.27  2.62 17.38]), any of ['right'] saves it",
+      "culprits": [
+        [
+          25,
+          7.840189311505384
+        ],
+        [
+          1,
+          5.310912147812536
+        ],
+        [
+          7,
+          4.746603838589472
+        ]
+      ],
+      "alpha": 39.62025248489128,
+      "d_norm": 7.027600078866816,
+      "H_size": 4350,
+      "fixed": true,
+      "probe_flips": 697,
+      "probe_size": 17398,
+      "return_before": 5.71875,
+      "return_after": 7.34375
+    },
+    {
+      "repair": 8,
+      "failure_card": "seed 12 step 63: ball at col 6 falling into col 5, paddle center 6 -> policy chose 'right' (logits [22.27 15.27 16.23  1.81 25.86]), any of ['no-op', 'left'] saves it",
+      "culprits": [
+        [
+          3,
+          6.771559462333491
+        ],
+        [
+          28,
+          4.549297149783215
+        ],
+        [
+          10,
+          3.7115552488273496
+        ]
+      ],
+      "alpha": 47.35474461835943,
+      "d_norm": 3.0145994315280324,
+      "H_size": 4735,
+      "fixed": true,
+      "probe_flips": 523,
+      "probe_size": 18940,
+      "return_before": 7.34375,
+      "return_after": 5.0
+    }
+  ]
+}
