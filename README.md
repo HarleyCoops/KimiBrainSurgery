@@ -143,6 +143,36 @@ games where the original policy had the specific failure the gym repaired. (An e
 64-game pilot showed the same shape — 4/0/60 — but with a CI that barely excluded zero;
 the larger set tightens the estimate from +0.50 [+0.02, +1.20] to +1.08 [+0.85, +1.31].)
 
+## Experiment 6 — chasing the last failure, and finding the miner's blind spot
+
+The monotonic loop left one failure unresolved (the seed-12 right-edge miss; its W2 edits
+all tripped the gate). `chase_unresolved.py` attacks it with a solver grid — W2 and W3,
+λ ∈ {10, 100, 1000}, margin ∈ {0.1, 0.5, 1, 2} — gated on return as usual. Every W2 config
+fails to fix it; **every W3 null-space config fixes it** (the readout layer was the right
+tool for this one). Best: W3 λ=10, return 9.83 → 9.95. One more monotonic W2 step on top
+reaches 10.06 gated. Those weights are `best_weights_v3.npz`
+([grid-policy-mlp-repaired-v3](https://huggingface.co/HarleyCooper/grid-policy-mlp-repaired-v3)).
+
+But the 1,000-game paired eval surfaces what the gate missed:
+
+| model | mean (1000 held-out) | wins / losses / ties vs original |
+|---|---|---|
+| original | 8.69 | — |
+| v1 (published) | 9.77 | 137 / **0** / 863 |
+| v3 | **10.53** | 137 / **17** / 846 |
+
+All 17 v3 losses are the same game shape: baseline scores 13, v3 scores 0. Tracing one
+(seed 20021): the original policy pre-positions the paddle while the ball is *ascending*;
+v3 has unlearned that habit, so by the time the ball descends the miss is already
+unavoidable. **The miner only inspects descending balls, so failure-to-pre-position is a
+structural blind spot** — the failure happens at a node the failure definition never visits.
+The fix for the last descending-ball failure cost an ascending-ball behavior, and no part
+of the mine → diagnose → solve loop could see it. Only the paired eval could.
+
+v1 stays the flagship release: never worse on 1,000 games is a stronger guarantee than
++0.76 more mean with 17 catastrophic regressions. Extending the miner to ascent-phase
+positioning failures is the open problem.
+
 ## Why it matters
 
 Weight-space editing promises behavior as inspectable, addressable mathematics: find the numbers responsible, change exactly those, verify nothing else moved. Experiment 1 shows the naive version of that promise fails even on a toy network — knowledge is stored in shared, overlapping features, so unconstrained edits are never local. Experiment 2 shows the fix is also mathematical: the same linear structure that makes failures diagnosable makes collateral damage *compressible into a constraint*. Diagnosis and containment come from the same equation. Experiment 3 marks the current boundary: at the readout layer the loop is exact and composes; one nonlinearity deeper, the measurement instrument and the edit start interfering with each other.
@@ -158,10 +188,13 @@ Honest caveats: 17k parameters, greedy-play evaluation, W2/W3 edits only (W1 is 
 | `w2_gym.py` | Rank-1 probe-constrained W2 solver with trust region + Newton refinement |
 | `fullrank_gym.py` | Full-rank constrained W2 solver via block-diagonal Gram structure |
 | `monotonic_gym.py` | Full-rank solver + keep/rollback gate, regression retests, held-out final eval |
+| `chase_unresolved.py` | Solver-grid attack on the one failure the monotonic loop rolled back |
 | `paired_eval.py` | Paired per-seed held-out eval with bootstrap CI + sign test |
 | `plot_nullspace.py`, `make_gym_figure.py`, `plot_w2.py`, `plot_fullrank.py` | Figure generators |
 | `assets/game.py`, `assets/policy.py` | Authoritative deterministic Breakout physics + policy wrapper |
 | `assets/policy_weights.npz` | The trained GridPolicyMLP weights (17,253 params) |
 | `results_nullspace_*.json`, `results_w2_*.json`, `results_fullrank_*.json`, `results_monotonic_*.json` | Raw run records for all sweeps |
+| `best_weights.npz` / `best_weights_v3.npz` | The repaired checkpoints (v1 = never-worse; v3 = max mean, 17 regressions) |
+| `eval/paired_heldout*.json` | Paired per-seed held-out scores, 1000 games |
 
 *Physics engine from [weight-space-breakout](https://app.primeintellect.ai/dashboard/environments/harleycooper/weight-space-breakout) (MIT). Built with [Kimi](https://kimi.com).*

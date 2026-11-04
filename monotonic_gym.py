@@ -44,8 +44,12 @@ def mean_return(weights, eval_seeds):
     return float(np.mean(rets))
 
 
-def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10000, 10064)):
+def run(lam=100.0, max_repairs=24, mine_seeds=range(0, 200), eval_seeds=range(10000, 10064),
+        start=None):
     weights = {k: v.copy() for k, v in g.BASE_WEIGHTS.items()}
+    if start is not None:
+        weights = {k: np.load(start)[k].astype(np.float64) for k in
+                   ("W1", "b1", "W2", "b2", "W3", "b3")}
     history = []
     unresolved = {}           # obs bytes -> failure card, edits rolled back
     repaired = []             # (obs, saving actions, card) retested after each kept edit
