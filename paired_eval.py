@@ -15,7 +15,7 @@ import numpy as np
 import failure_gym as g
 
 ROOT = Path(__file__).parent
-SEEDS = list(range(20000, 20064))  # untouched held-out set from the monotonic run
+SEEDS = list(range(20000, 21000))  # untouched held-out set, 1000 games
 BOOTSTRAP_N = 100_000
 RNG_SEED = 42
 

@@ -115,25 +115,33 @@ The gain generalizes. The repaired weights are published as
 and the [live visualizer](https://harleycoops.github.io/breakout-policy-visualizer/) has a
 weights selector so you can watch the original and repaired policies play side by side.
 
-### Paired per-seed verification
+### Paired per-seed verification (1,000 held-out games)
 
-`paired_eval.py` replays both checkpoints on the same 64 held-out games and stores every
-per-seed score in `eval/paired_heldout.json`. Exact checkpoints, hashed for reproduction:
+`paired_eval.py` replays both checkpoints on the same held-out games (seeds 20000–20999,
+greedy, never mined or gated on) and stores every per-seed score in
+`eval/paired_heldout.json`. Exact checkpoints, hashed for reproduction:
 
 | checkpoint | sha256 (first 16) |
 |---|---|
 | `policy_weights.npz` (original) | `d3cd5623fdae730f` |
 | `best_weights.npz` (repaired) | `9c338f7c08c9590a` |
 
-The paired picture is more honest than the means alone: **60 of 64 games are exact ties**,
-and the entire +0.50 gain comes from 4 games the repaired policy wins — two of them
-decisively (2 → 17, seeds 20006 and 20029). Zero games get worse. The bootstrap 95% CI on
-the paired difference is [+0.02, +1.20] reward/game; a two-sided sign test over the 4
-non-tied games gives p = 0.125. Reading: the repair is a strict improvement in the
-stochastic sense (never worse, sometimes much better), concentrated in a small number of
-games where the original policy had a specific exploitable failure — exactly what
-failure-targeted editing should produce. 64 games cannot pin down the effect size tightly;
-more held-out seeds would narrow the CI.
+Results over 1,000 paired games:
+
+| metric | value |
+|---|---|
+| baseline mean return | 8.69 |
+| repaired mean return | 9.77 |
+| paired difference | **+1.08 ± 3.74 (sd)** |
+| bootstrap 95% CI on diff | **[+0.85, +1.31]** |
+| wins / losses / ties | **137 / 0 / 863** |
+| sign test p | < 10⁻⁴ |
+
+The picture is unambiguous: the repaired policy is **never worse on any of 1,000 games**
+and strictly better in 137 of them — a strict stochastic improvement, concentrated in the
+games where the original policy had the specific failure the gym repaired. (An earlier
+64-game pilot showed the same shape — 4/0/60 — but with a CI that barely excluded zero;
+the larger set tightens the estimate from +0.50 [+0.02, +1.20] to +1.08 [+0.85, +1.31].)
 
 ## Why it matters
 
