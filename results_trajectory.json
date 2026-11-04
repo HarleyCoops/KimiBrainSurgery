@@ -1,0 +1,468 @@
+{
+  "start_checkpoint": "chain_final.npz",
+  "kept_trajectories": 2,
+  "attempts": 9,
+  "protected_trajectories": 2,
+  "deferred_failures": 7,
+  "fresh_seeds": [
+    50000,
+    50499
+  ],
+  "fresh_mean_original": 8.572,
+  "fresh_mean_v4": 12.472,
+  "fresh_mean_start": 12.472,
+  "fresh_mean_final": 12.088,
+  "fresh_diff_vs_start": -0.384,
+  "fresh_vs_start_WLT": [
+    159,
+    144,
+    197
+  ],
+  "dev_diff_vs_start": -0.6366666666666667,
+  "dev_vs_start_WLT": [
+    95,
+    89,
+    116
+  ],
+  "v5_written": false,
+  "history": [
+    {
+      "attempt": 1,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 20021 step 1: ball at col 3 falling into col 8, paddle center 2 -> policy chose 'no-op' (logits [30.24 30.22 30.13 30.1  30.04]), any of ['right'] saves it",
+      "trajectory_states": 5,
+      "state_failures": 1,
+      "rescued": 0,
+      "rescue_actions": [
+        1,
+        4,
+        4,
+        4,
+        1
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 7468,
+      "return_after": 11.296875
+    },
+    {
+      "attempt": 1,
+      "method": "w2-trajectory",
+      "kept": false,
+      "card": "seed 20021 step 1: ball at col 3 falling into col 8, paddle center 2 -> policy chose 'no-op' (logits [30.24 30.22 30.13 30.1  30.04]), any of ['right'] saves it",
+      "trajectory_states": 5,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 1197,
+      "return_after": 9.46875
+    },
+    {
+      "attempt": 1,
+      "method": "gradient-trajectory",
+      "kept": false,
+      "card": "seed 20021 step 1: ball at col 3 falling into col 8, paddle center 2 -> policy chose 'no-op' (logits [30.24 30.22 30.13 30.1  30.04]), any of ['right'] saves it",
+      "trajectory_states": 5,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 8303,
+      "return_after": 9.46875
+    },
+    {
+      "attempt": 2,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 1 step 36: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'down' (logits [31.38 31.37 31.42 20.94 26.65]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 2,
+      "rescued": 0,
+      "rescue_actions": [
+        0,
+        2
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 9416,
+      "return_after": 9.53125
+    },
+    {
+      "attempt": 2,
+      "method": "w2-trajectory",
+      "kept": false,
+      "card": "seed 1 step 36: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'down' (logits [31.38 31.37 31.42 20.94 26.65]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 2672,
+      "return_after": 9.609375
+    },
+    {
+      "attempt": 2,
+      "method": "gradient-trajectory",
+      "kept": false,
+      "card": "seed 1 step 36: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'down' (logits [31.38 31.37 31.42 20.94 26.65]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 1,
+      "rescued": 0,
+      "rescue_actions": [
+        0,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 19930,
+      "return_after": 3.15625
+    },
+    {
+      "attempt": 3,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 2 step 28: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.66 30.95 30.64 18.94 27.24]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 1,
+      "rescued": 0,
+      "rescue_actions": [
+        2,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 11277,
+      "return_after": 9.65625
+    },
+    {
+      "attempt": 3,
+      "method": "w2-trajectory",
+      "kept": false,
+      "card": "seed 2 step 28: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.66 30.95 30.64 18.94 27.24]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 3508,
+      "return_after": 9.9375
+    },
+    {
+      "attempt": 3,
+      "method": "gradient-trajectory",
+      "kept": false,
+      "card": "seed 2 step 28: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'up' (logits [30.66 30.95 30.64 18.94 27.24]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 1,
+      "rescued": 0,
+      "rescue_actions": [
+        0,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 21133,
+      "return_after": 3.0
+    },
+    {
+      "attempt": 4,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 5 step 43: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'right' (logits [28.8  28.91 28.6  27.17 30.29]), any of ['left'] saves it",
+      "trajectory_states": 5,
+      "state_failures": 2,
+      "rescued": 0,
+      "rescue_actions": [
+        2,
+        3,
+        3,
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 14437,
+      "return_after": 5.25
+    },
+    {
+      "attempt": 4,
+      "method": "w2-trajectory",
+      "kept": false,
+      "card": "seed 5 step 43: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'right' (logits [28.8  28.91 28.6  27.17 30.29]), any of ['left'] saves it",
+      "trajectory_states": 5,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 2001,
+      "return_after": 7.875
+    },
+    {
+      "attempt": 4,
+      "method": "gradient-trajectory",
+      "kept": false,
+      "card": "seed 5 step 43: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'right' (logits [28.8  28.91 28.6  27.17 30.29]), any of ['left'] saves it",
+      "trajectory_states": 5,
+      "state_failures": 1,
+      "rescued": 0,
+      "rescue_actions": [
+        3,
+        3,
+        3,
+        0,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 18783,
+      "return_after": 2.90625
+    },
+    {
+      "attempt": 5,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 9 step 20: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'no-op' (logits [30.46 30.34 29.14 17.88 25.41]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 1,
+      "rescued": 0,
+      "rescue_actions": [
+        1,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 14695,
+      "return_after": 7.3125
+    },
+    {
+      "attempt": 5,
+      "method": "w2-trajectory",
+      "kept": true,
+      "card": "seed 9 step 20: ball at col 3 falling into col 1, paddle center 4 -> policy chose 'no-op' (logits [30.46 30.34 29.14 17.88 25.41]), any of ['left'] saves it",
+      "trajectory_states": 2,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 5461,
+      "return_after": 13.015625
+    },
+    {
+      "attempt": 6,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 0 step 34: ball at col 4 falling into col 2, paddle center 6 -> policy chose 'right' (logits [30.16 30.19 30.11 29.95 30.19]), any of ['no-op', 'left'] saves it",
+      "trajectory_states": 4,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0,
+        3,
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 6467,
+      "return_after": 12.5625
+    },
+    {
+      "attempt": 6,
+      "method": "w2-trajectory",
+      "kept": false,
+      "card": "seed 0 step 34: ball at col 4 falling into col 2, paddle center 6 -> policy chose 'right' (logits [30.16 30.19 30.11 29.95 30.19]), any of ['no-op', 'left'] saves it",
+      "trajectory_states": 4,
+      "state_failures": 1,
+      "rescued": 1,
+      "rescue_actions": [
+        1,
+        3,
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 1904,
+      "return_after": 13.96875
+    },
+    {
+      "attempt": 6,
+      "method": "gradient-trajectory",
+      "kept": false,
+      "card": "seed 0 step 34: ball at col 4 falling into col 2, paddle center 6 -> policy chose 'right' (logits [30.16 30.19 30.11 29.95 30.19]), any of ['no-op', 'left'] saves it",
+      "trajectory_states": 4,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0,
+        3,
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 7228,
+      "return_after": 12.5625
+    },
+    {
+      "attempt": 7,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 4 step 10: ball at col 4 falling into col 8, paddle center 4 -> policy chose 'left' (logits [30.88 30.71 30.67 31.97 28.96]), any of ['no-op', 'right'] saves it",
+      "trajectory_states": 4,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0,
+        4,
+        4,
+        4
+      ],
+      "regressions": 1,
+      "regression_rescues": 1,
+      "probe_flips": 11441,
+      "return_after": 10.65625
+    },
+    {
+      "attempt": 7,
+      "method": "w2-trajectory",
+      "kept": false,
+      "card": "seed 4 step 10: ball at col 4 falling into col 8, paddle center 4 -> policy chose 'left' (logits [30.88 30.71 30.67 31.97 28.96]), any of ['no-op', 'right'] saves it",
+      "trajectory_states": 4,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0,
+        4,
+        4,
+        4
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 571,
+      "return_after": 10.984375
+    },
+    {
+      "attempt": 7,
+      "method": "gradient-trajectory",
+      "kept": false,
+      "card": "seed 4 step 10: ball at col 4 falling into col 8, paddle center 4 -> policy chose 'left' (logits [30.88 30.71 30.67 31.97 28.96]), any of ['no-op', 'right'] saves it",
+      "trajectory_states": 4,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0,
+        4,
+        4,
+        4
+      ],
+      "regressions": 1,
+      "regression_rescues": 1,
+      "probe_flips": 10686,
+      "return_after": 10.21875
+    },
+    {
+      "attempt": 8,
+      "method": "w3-trajectory",
+      "kept": false,
+      "card": "seed 5 step 75: ball at col 2 falling into col 1, paddle center 2 -> policy chose 'right' (logits [30.18 30.2  30.13 29.97 30.21]), any of ['no-op', 'left'] saves it",
+      "trajectory_states": 1,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 6333,
+      "return_after": 12.5625
+    },
+    {
+      "attempt": 8,
+      "method": "w2-trajectory",
+      "kept": false,
+      "card": "seed 5 step 75: ball at col 2 falling into col 1, paddle center 2 -> policy chose 'right' (logits [30.18 30.2  30.13 29.97 30.21]), any of ['no-op', 'left'] saves it",
+      "trajectory_states": 1,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0
+      ],
+      "regressions": 1,
+      "regression_rescues": 1,
+      "probe_flips": 2493,
+      "return_after": 14.15625
+    },
+    {
+      "attempt": 8,
+      "method": "gradient-trajectory",
+      "kept": false,
+      "card": "seed 5 step 75: ball at col 2 falling into col 1, paddle center 2 -> policy chose 'right' (logits [30.18 30.2  30.13 29.97 30.21]), any of ['no-op', 'left'] saves it",
+      "trajectory_states": 1,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        0
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 7210,
+      "return_after": 12.5625
+    },
+    {
+      "attempt": 9,
+      "method": "w3-trajectory",
+      "kept": true,
+      "card": "seed 9 step 17: ball at col 6 falling into col 1, paddle center 7 -> policy chose 'up' (logits [29.47 29.56 29.35 29.44 28.7 ]), any of ['left'] saves it",
+      "trajectory_states": 5,
+      "state_failures": 0,
+      "rescued": 1,
+      "rescue_actions": [
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "regressions": 0,
+      "regression_rescues": 0,
+      "probe_flips": 3688,
+      "return_after": 13.71875
+    }
+  ]
+}

@@ -314,6 +314,39 @@ not just enter it. That is Experiment 10.
 checkpoint; no v5 was published, because the fresh-seed gain is zero and the honest model
 is the one that earned it.
 
+## Experiment 10 — trajectory constraints fix follow-through, but the gate overfits
+
+`trajectory_gym.py` implements the direct fix proposed above. Starting from `chain_final.npz`,
+it replays each mined failure under forced saving actions until the next row-8 catch, keeps
+every successor state as a constraint, and requires an actual greedy rescue replay. The repair
+ladder uses an exact whole-`W3` multi-constraint solve, full-rank multi-constraint `W2`, then
+an elastic-anchored gradient hinge. Previously protected trajectories are retested after every
+candidate. Unlike earlier per-save-column batching, the `W3` solve directly controls each
+`logit[wrong] - logit[save]` gap across the complete readout edit.
+
+The known follow-through defect is repaired. On seed 9, the accepted starting policy scores 2;
+the final trajectory candidate scores **17**. Attempt 5 fixes the step-20 defection with `W2`,
+and attempt 9 repairs the re-mined step-17 entry decision with `W3`. Both actual rescue replays
+contain only saving actions. Across 9 attempts, 2 of 24 candidates pass the hard gate and gate
+return rises 12.09 → 13.72.
+
+The untouched evaluation rejects the candidate anyway:
+
+| metric, seeds 50000-50499 | start (`chain_final`) | trajectory final |
+|---|---:|---:|
+| mean return | **12.472** | **12.088** |
+| paired difference vs start | — | **-0.384** |
+| wins / losses / ties vs start | — | **159 / 144 / 197** |
+
+Development seeds 0-299 also fall by 0.637 mean return (95 wins, 89 losses, 116 ties). Thus the
+64 reused gate seeds are not a reliable proxy for whole-policy improvement: local trajectory
+verification is necessary to fix follow-through, but it does not contain off-target behavior.
+`trajectory_final.npz` is retained as a rejected research candidate; **no v5 was written**, under
+the stricter promotion rule of positive fresh mean gain plus zero fresh losses. Raw candidate
+history is in `results_trajectory.json`, and paired per-seed scores are in
+`eval/paired_trajectory_fresh.json`. The next cycle should isolate the two accepted edits on a
+new validation set and roll back harmful trajectory repairs before another untouched final eval.
+
 ## Why it matters
 
 Weight-space editing promises behavior as inspectable, addressable mathematics: find the numbers responsible, change exactly those, verify nothing else moved. Experiment 1 shows the naive version of that promise fails even on a toy network — knowledge is stored in shared, overlapping features, so unconstrained edits are never local. Experiment 2 shows the fix is also mathematical: the same linear structure that makes failures diagnosable makes collateral damage *compressible into a constraint*. Diagnosis and containment come from the same equation. Experiment 3 marks the current boundary: at the readout layer the loop is exact and composes; one nonlinearity deeper, the measurement instrument and the edit start interfering with each other.
@@ -330,6 +363,8 @@ Honest caveats: 17k parameters, greedy-play evaluation, W2/W3 edits only (W1 is 
 | `fullrank_gym.py` | Full-rank constrained W2 solver via block-diagonal Gram structure |
 | `monotonic_gym.py` | Full-rank solver + keep/rollback gate, regression retests, held-out final eval |
 | `chain_gym.py` | The complete chain: mine, repair (W3/W2/gradient ladder), hard gate, fresh eval, repeat |
+| `trajectory_gym.py` | Experiment 10: trajectory constraints, actual rescue replays, protected-trajectory retests |
+| `test_trajectory_gym.py` | Regression tests for forced rescue construction, replay, and exact W3 constraints |
 | `batch_gym.py` / `batch_fullrank_gym.py` | Batch-constrained solvers: W3 exact/soft and full-rank W2, one edit per failure class |
 | `chase_unresolved.py` | Solver-grid attack on the one failure the monotonic loop rolled back |
 | `paired_eval.py` | Paired per-seed held-out eval with bootstrap CI + sign test |
