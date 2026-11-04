@@ -300,7 +300,10 @@ repaired the entry node of each failure, but a rescue is a *trajectory*: the sav
 must be taken at every node until the ball is caught, and nothing constrains the policy
 downstream of the repaired state. This also retroactively explains the Experiment 8
 frontier — the residual 13->0 class is precisely the set of failures whose rescue requires
-multi-step commitment, and no single-node edit, however clever, can supply that.
+multi-step commitment. A single-node constraint does not constrain the successor
+states by construction, and none of the single-node solvers tested here supplied the
+follow-through. Whether a sufficiently clever single-node edit could is open; the
+observed defect pattern points at trajectory constraints as the direct fix.
 
 The fix is well-defined: trajectory-constrained repair. When a failure is mined, roll the
 rescue prefix forward under forced saving actions, collect every successor state until the
